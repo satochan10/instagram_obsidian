@@ -16,8 +16,9 @@
 - Vaultパスは `.env` の `OBSIDIAN_VAULT_PATH` から読み込む。未設定/存在しない場合はエラーメッセージを表示して起動を中止する（スペック記載）
 - `.obsidian/` 配下は走査対象から除外する（スペック記載）
 - フロントマターが無い/壊れているノートは除外せず「Properties未設定」として結果に含める（スペック記載）
-- このプロジェクトはGit管理されていない（`git rev-parse --is-inside-work-tree` が失敗することを確認済み）。**各タスク末尾は「commit」ではなく「動作確認」を最終ステップとする**（通常のwriting-plansの型からの意図的な逸脱）
+- このプロジェクトは元々Git管理されていなかったが、今回の実装（Subagent-Driven Development）のために`git init`済み（コミット`d9220b5`「Initial commit: Instagram連携プロジェクトの既存資産」）。以降の各タスクは通常通り「動作確認 → commit」で終える
 - 自動テスト（pytest等）は作成しない。スペック記載の通り、実際のVault（27ファイル）に対する目視・curl確認で代替する（意図的な逸脱）
+- **README更新は各タスクの中で都度行う**（実装が終わった段階でTask 6にまとめて書くのではなく、そのタスクで追加したファイル・使い方が確定した時点でREADME.mdの該当セクションを更新してコミットに含める。ユーザー指示によるGlobal Constraint）
 
 ---
 
@@ -65,6 +66,15 @@ Run: `mkdir -p web`
 
 Run: `grep OBSIDIAN_VAULT_PATH .env .env.example && ls -d web`
 Expected: 両方の`.env`系ファイルに`OBSIDIAN_VAULT_PATH`の行があり、`web`ディレクトリが存在する
+
+- [ ] **Step 7: コミット**
+
+`.env`はgitignore対象なのでコミットに含まれない（`.env.example`のみ含まれる）。
+
+```bash
+git add .env.example web
+git commit -m "chore: add pyyaml dependency and OBSIDIAN_VAULT_PATH config for obsidian UI"
+```
 
 ---
 
@@ -234,12 +244,20 @@ for n in no_props:
 ```
 Expected: `TODO.md` と `USJ 朝並ぶ.md` の2件が表示される
 
+- [ ] **Step 5: コミット**
+
+```bash
+git add web/server.py
+git commit -m "feat: add Obsidian vault scanning and frontmatter parsing"
+```
+
 ---
 
 ### Task 3: HTTPサーバー・APIエンドポイント
 
 **Files:**
 - Modify: `web/server.py`（Task 2の関数群はそのまま、`if __name__ == "__main__":` ブロックをHTTPサーバー起動処理に置き換え、`Handler`クラスを追加）
+- Modify: `README.md`（「ディレクトリ構成」に`web/server.py`を追記。`index.html`/`obsidian.html`はまだ存在しないのでこの時点では書かない）
 
 **Interfaces:**
 - Consumes: Task 2の `get_vault_path`, `scan_vault`, `filter_notes`, `build_facets`
@@ -343,12 +361,29 @@ Expected: 条件に一致するノートのJSON配列が返る
 
 Run: `kill %1`（Step 3でバックグラウンド起動したジョブを終了する）
 
+- [ ] **Step 6: README.mdの「ディレクトリ構成」セクションを更新**
+
+`## ディレクトリ構成` のコードブロック内、`└── logs/` ブロックの後（末尾の \`\`\` の直前）に以下を追加する:
+
+```
+└── web/
+    └── server.py          # ローカルダッシュボード用HTTPサーバ(Obsidian Properties検索など)。 /api/obsidian/* を提供
+```
+
+- [ ] **Step 7: コミット**
+
+```bash
+git add web/server.py README.md
+git commit -m "feat: add HTTP server with /api/obsidian/* endpoints"
+```
+
 ---
 
 ### Task 4: obsidian.html（検索・一覧UI）
 
 **Files:**
 - Create: `web/obsidian.html`
+- Modify: `README.md`（「ディレクトリ構成」の`web/`ブロックに`obsidian.html`を追記し、「できること」セクションに機能を1行追記）
 
 **Interfaces:**
 - Consumes: `GET /api/obsidian/facets`, `GET /api/obsidian/notes?...`（Task 3で実装済み）
@@ -533,12 +568,36 @@ Expected（`http://localhost:8765/obsidian.html` を手動で開いて確認）:
 
 Ctrl+Cでサーバーを停止する
 
+- [ ] **Step 4: README.mdを更新**
+
+`## ディレクトリ構成` の `web/` ブロック（Task 3で追加済み）に1行追加する:
+
+```
+└── web/
+    ├── server.py          # ローカルダッシュボード用HTTPサーバ(Obsidian Properties検索など)。 /api/obsidian/* を提供
+    └── obsidian.html       # Obsidian VaultのProperties検索UI
+```
+
+`## できること` の箇条書きの末尾に以下を追加する:
+
+```
+- **ローカルUI（`./venv/bin/python web/server.py`を起動）から** Obsidian VaultノートのProperties（type/category/status/tags）を検索・一覧表示（`web/obsidian.html`）
+```
+
+- [ ] **Step 5: コミット**
+
+```bash
+git add web/obsidian.html README.md
+git commit -m "feat: add Obsidian properties search UI"
+```
+
 ---
 
 ### Task 5: index.html（ダッシュボード入口）
 
 **Files:**
 - Create: `web/index.html`
+- Modify: `README.md`（「ディレクトリ構成」の`web/`ブロックに`index.html`を追記し、「クイックスタート」に起動コマンドを追記）
 
 **Interfaces:**
 - Consumes: なし（静的リンクのみ）
@@ -575,29 +634,16 @@ Expected: ブラウザが自動で開き、`http://localhost:8765/` に「Obsidi
 
 Ctrl+Cでサーバーを停止する
 
----
+- [ ] **Step 3: README.mdを更新**
 
-### Task 6: README更新・最終通し確認
-
-**Files:**
-- Modify: `README.md`（「ディレクトリ構成」と「クイックスタート」にobsidian_ui関連の記述を追加）
-
-**Interfaces:**
-- Consumes: Task 1〜5で作成した全ファイル
-- Produces: なし（ドキュメント更新のみ）
-
-- [ ] **Step 1: README.mdの「ディレクトリ構成」セクションに`web/`を追記**
-
-`## ディレクトリ構成` のコードブロック内、`└── logs/` ブロックの後（末尾の \`\`\` の直前）に以下を追加する:
+`## ディレクトリ構成` の `web/` ブロック（Task 3・4で追加済み）に1行追加する:
 
 ```
 └── web/
-    ├── server.py          # ローカルダッシュボード用HTTPサーバ(Obsidian Properties検索など)
+    ├── server.py          # ローカルダッシュボード用HTTPサーバ(Obsidian Properties検索など)。 /api/obsidian/* を提供
     ├── index.html          # ダッシュボード入口
     └── obsidian.html       # Obsidian VaultのProperties検索UI
 ```
-
-- [ ] **Step 2: README.mdの「クイックスタート」セクションに起動コマンドを追記**
 
 `### 自分でコマンドを打つ場合` のコードブロック内に以下を追加する:
 
@@ -606,7 +652,25 @@ Ctrl+Cでサーバーを停止する
 ./venv/bin/python web/server.py
 ```
 
-- [ ] **Step 3: スペックに記載した確認項目を通しで実行**
+- [ ] **Step 4: コミット**
+
+```bash
+git add web/index.html README.md
+git commit -m "feat: add dashboard entry page"
+```
+
+---
+
+### Task 6: 最終通し確認
+
+**Files:**
+- なし（コードは既にTask 1〜5で完成。このタスクはスペックの確認項目を通しで実行するのみ）
+
+**Interfaces:**
+- Consumes: Task 1〜5で作成した全ファイル
+- Produces: なし（確認のみ）
+
+- [ ] **Step 1: スペックに記載した確認項目を通しで実行**
 
 Run: `./venv/bin/python web/server.py`
 
