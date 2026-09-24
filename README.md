@@ -1,6 +1,21 @@
 # Instagram連携・分析プロジェクト
 
-Instagram Graph API（Instagram単体ログイン方式）に接続し、投稿データ・インサイトを取得してアカウント分析レポートを作るための一式。
+Instagram Graph API（Instagram単体ログイン方式）に接続し、投稿データ・インサイトを取得してアカウント分析レポートを作るための一式。Obsidian Vaultのノート検索UIも同梱している。
+
+## 起動方法
+
+```bash
+# Obsidian VaultのProperties検索UIを起動(ブラウザが自動で開く)
+./venv/bin/python web/server.py
+
+# 分析レポートを生成(投稿データ取得 → レポート作成)
+./scripts/run_analysis.sh
+
+# 画像投稿を公開(キャプションは事前に承認済みのものを渡す)
+./venv/bin/python scripts/publish_post.py \
+  --image-url "https://www.dropbox.com/scl/fi/xxxx/photo.jpg?rlkey=yyy&dl=0" \
+  --caption "承認済みのキャプション本文"
+```
 
 ## クイックスタート
 
@@ -10,18 +25,8 @@ Instagram Graph API（Instagram単体ログイン方式）に接続し、投稿�
 投稿を公開したい場合は、Dropboxの共有リンクとキャプション案を渡して会話する。Claudeが下書きを提示し、「OK」と返すと `publish_post.py` が実行されて公開される。
 
 ### 自分でコマンドを打つ場合
+各コマンドは「起動方法」を参照。自動実行の制御は以下:
 ```bash
-# 分析レポートを生成(投稿データ取得 → レポート作成)
-./scripts/run_analysis.sh
-
-# 画像投稿を公開(キャプションは事前に承認済みのものを渡す)
-./venv/bin/python scripts/publish_post.py \
-  --image-url "https://www.dropbox.com/scl/fi/xxxx/photo.jpg?rlkey=yyy&dl=0" \
-  --caption "承認済みのキャプション本文"
-
-# Obsidian VaultのProperties検索UIを起動(ブラウザが自動で開く)
-./venv/bin/python web/server.py
-
 # 毎朝10時の自動実行を止める/再開する
 launchctl unload ~/Library/LaunchAgents/com.tomo.ig-daily-fetch.plist
 launchctl load ~/Library/LaunchAgents/com.tomo.ig-daily-fetch.plist
