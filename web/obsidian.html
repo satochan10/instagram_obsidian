@@ -23,6 +23,9 @@
 <h1>Obsidian Properties検索</h1>
 
 <div class="filters">
+  <label>ファイル名・タイトル検索
+    <input id="filter-query" type="text" placeholder="部分一致">
+  </label>
   <label>type
     <select id="filter-type"><option value="">すべて</option></select>
   </label>
@@ -140,10 +143,12 @@ async function loadNotes() {
   const category = document.getElementById("filter-category").value;
   const status = document.getElementById("filter-status").value;
   const tags = document.getElementById("filter-tags").value;
+  const query = document.getElementById("filter-query").value;
   if (type) params.set("type", type);
   if (category) params.set("category", category);
   if (status) params.set("status", status);
   if (tags) params.set("tag", tags);
+  if (query) params.set("q", query);
 
   const res = await fetch(`/api/obsidian/notes?${params.toString()}`);
   const notes = await res.json();
@@ -158,7 +163,13 @@ document.getElementById("filter-tags").addEventListener("input", () => {
   window._tagDebounce = setTimeout(loadNotes, 300);
 });
 
+document.getElementById("filter-query").addEventListener("input", () => {
+  clearTimeout(window._queryDebounce);
+  window._queryDebounce = setTimeout(loadNotes, 300);
+});
+
 document.getElementById("clear-filters").addEventListener("click", () => {
+  document.getElementById("filter-query").value = "";
   document.getElementById("filter-type").value = "";
   document.getElementById("filter-category").value = "";
   document.getElementById("filter-status").value = "";

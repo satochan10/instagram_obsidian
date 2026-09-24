@@ -60,7 +60,7 @@ launchctl load ~/Library/LaunchAgents/com.tomo.ig-daily-fetch.plist
 
 - **画像投稿の自動公開**（`scripts/publish_post.py`）。Dropboxの共有リンクと承認済みキャプションを渡すと、Instagramのフィードに画像を公開する。キャプションの下書き生成・確認はClaudeとの会話内で行い、「OK」が出たものだけを公開する運用（スクリプト自体には確認ステップはない）
 
-- **ローカルUI（`./venv/bin/python web/server.py`を起動）から** Obsidian VaultノートのProperties（type/category/status/tags）を検索・一覧表示（`web/obsidian.html`）
+- **ローカルUI（`./venv/bin/python web/server.py`を起動）から** Obsidian VaultノートのProperties（type/category/status/tags）と、ファイル名・タイトルの部分一致キーワードで検索・一覧表示（`web/obsidian.html`）。「すべてクリア」でフィルタを一括リセット可能
 
 現時点でできないこと（詳細は「今後の課題」参照）：トークンの自動更新、他アカウントの人気投稿分析、コメント自動返信、カルーセル/リール投稿、投稿のスケジュール予約。
 

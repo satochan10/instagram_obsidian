@@ -103,6 +103,13 @@ def filter_notes(notes: list, query: dict) -> list:
             note_tags = note.get("tags") or []
             if not all(t in note_tags for t in wanted_tags):
                 return False
+        keyword = query.get("q")
+        if keyword:
+            keyword_lower = keyword.lower()
+            title = (note.get("title") or "").lower()
+            path = (note.get("path") or "").lower()
+            if keyword_lower not in title and keyword_lower not in path:
+                return False
         return True
 
     return [n for n in notes if matches(n)]
