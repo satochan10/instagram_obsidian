@@ -57,7 +57,7 @@ launchctl load ~/Library/LaunchAgents/com.tomo.ig-daily-fetch.plist
 ├── .env.example          # .envのひな形
 ├── venv/                 # Python仮想環境
 ├── scripts/
-│   ├── publish_post.py    # 画像投稿を公開(コンテナ作成→即公開)。承認済みキャプション前提
+│   ├── publish_post.py   # 画像投稿を公開(コンテナ作成→即公開)。承認済みキャプション前提
 │   ├── check_token.py    # トークン検証・長期化・Facebookページ経由のID自動取得(旧方式向け。今回のIG単体ログインでは未使用)
 │   ├── fetch_data.py     # 投稿一覧・インサイト・フォロワー情報を取得するメイン処理
 │   ├── analyze.py        # data/latest.json からMarkdownレポートを生成
@@ -70,13 +70,13 @@ launchctl load ~/Library/LaunchAgents/com.tomo.ig-daily-fetch.plist
 ├── reports/
 │   └── report_*.md       # analyze.pyが生成する日付付きレポート
 ├── logs/
-│   ├── daily_fetch.log       # daily_fetch.sh実行時の標準出力
-│   ├── launchd.out.log       # launchdからの標準出力
-│   └── launchd.err.log       # launchdからの標準エラー
+│   ├── daily_fetch.log   # daily_fetch.sh実行時の標準出力
+│   ├── launchd.out.log   # launchdからの標準出力
+│   └── launchd.err.log   # launchdからの標準エラー
 └── web/
-    ├── server.py          # ローカルダッシュボード用HTTPサーバ(Obsidian Properties検索など)。 /api/obsidian/* を提供
-    ├── index.html          # ダッシュボード入口
-    └── obsidian.html       # Obsidian VaultのProperties検索UI
+    ├── server.py         # ローカルダッシュボード用HTTPサーバ(Obsidian Properties検索など)。 /api/obsidian/* を提供
+    ├── index.html        # ダッシュボード入口
+    └── obsidian.html     # Obsidian VaultのProperties検索UI
 ```
 
 ## セットアップ済みの内容

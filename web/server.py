@@ -6,8 +6,12 @@ Obsidian Vault内ノートのPropertiesを検索・一覧表示するローカ�
 """
 import json
 import re
+import webbrowser
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from urllib.parse import parse_qs, urlparse
 
+import yaml
 from dotenv import dotenv_values
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -31,14 +35,14 @@ def get_vault_path() -> Path:
 
 
 def parse_note(path: Path, vault_root: Path) -> dict:
-    import yaml
-
     text = path.read_text(encoding="utf-8")
     match = FRONTMATTER_RE.match(text)
     if match:
         try:
             frontmatter = yaml.safe_load(match.group(1)) or {}
         except yaml.YAMLError:
+            frontmatter = {}
+        if not isinstance(frontmatter, dict):
             frontmatter = {}
         body = match.group(2)
     else:
@@ -70,7 +74,20 @@ def scan_vault(vault_root: Path) -> list:
     for md_path in sorted(vault_root.rglob("*.md")):
         if ".obsidian" in md_path.parts:
             continue
-        notes.append(parse_note(md_path, vault_root))
+        try:
+            notes.append(parse_note(md_path, vault_root))
+        except Exception as exc:  # noqa: BLE001 - 1ノートの読み込み失敗で全体を落とさないため意図的に広く捕捉
+            notes.append(
+                {
+                    "path": md_path.relative_to(vault_root).as_posix(),
+                    "title": md_path.stem,
+                    "type": None,
+                    "category": None,
+                    "status": None,
+                    "tags": [],
+                    "preview": f"(読み込みエラー: {exc})",
+                }
+            )
     return notes
 
 
@@ -101,10 +118,6 @@ def build_facets(notes: list) -> dict:
             facets["tags"].add(tag)
     return {key: sorted(values) for key, values in facets.items()}
 
-
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from urllib.parse import parse_qs, urlparse
-import webbrowser
 
 VAULT_ROOT = None  # main()実行時にセットされる
 
