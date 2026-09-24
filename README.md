@@ -19,6 +19,9 @@ Instagram Graph API（Instagram単体ログイン方式）に接続し、投稿�
   --image-url "https://www.dropbox.com/scl/fi/xxxx/photo.jpg?rlkey=yyy&dl=0" \
   --caption "承認済みのキャプション本文"
 
+# Obsidian VaultのProperties検索UIを起動(ブラウザが自動で開く)
+./venv/bin/python web/server.py
+
 # 毎朝10時の自動実行を止める/再開する
 launchctl unload ~/Library/LaunchAgents/com.tomo.ig-daily-fetch.plist
 launchctl load ~/Library/LaunchAgents/com.tomo.ig-daily-fetch.plist
@@ -72,6 +75,7 @@ launchctl load ~/Library/LaunchAgents/com.tomo.ig-daily-fetch.plist
 │   └── launchd.err.log       # launchdからの標準エラー
 └── web/
     ├── server.py          # ローカルダッシュボード用HTTPサーバ(Obsidian Properties検索など)。 /api/obsidian/* を提供
+    ├── index.html          # ダッシュボード入口
     └── obsidian.html       # Obsidian VaultのProperties検索UI
 ```
 
