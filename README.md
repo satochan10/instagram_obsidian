@@ -12,6 +12,18 @@ cd instagram_obsidian
 ## 起動方法
 
 ```bash
+./run.sh
+```
+メニューから選ぶだけで、分析・投稿・Obsidian UIのいずれかを実行できる。
+
+```
+1) 分析（投稿データ取得 → レポート作成）
+2) 投稿（画像投稿を公開）
+3) Obsidian UI（Vault内ノートのProperties検索）
+```
+
+個別に直接コマンドを叩きたい場合は以下（`run.sh`はこれらのラッパー）:
+```bash
 # Obsidian VaultのProperties検索UIを起動(ブラウザが自動で開く)
 ./venv/bin/python web/server.py
 
@@ -65,6 +77,7 @@ launchctl load ~/Library/LaunchAgents/com.tomo.ig-daily-fetch.plist
 
 ```
 .
+├── run.sh                 # メニュー形式の起動ランチャー(分析/投稿/Obsidian UIを選択実行)
 ├── .env                  # 認証情報(gitignore対象・絶対に共有しない)
 ├── .env.example          # .envのひな形
 ├── venv/                 # Python仮想環境
