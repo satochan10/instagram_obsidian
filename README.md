@@ -2,6 +2,13 @@
 
 Instagram Graph API（Instagram単体ログイン方式）に接続し、投稿データ・インサイトを取得してアカウント分析レポートを作るための一式。Obsidian Vaultのノート検索UIも同梱している。
 
+リポジトリ: https://github.com/satochan10/instagram_obsidian.git
+
+```bash
+git clone https://github.com/satochan10/instagram_obsidian.git
+cd instagram_obsidian
+```
+
 ## 起動方法
 
 ```bash
