@@ -102,8 +102,69 @@ def build_facets(notes: list) -> dict:
     return {key: sorted(values) for key, values in facets.items()}
 
 
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from urllib.parse import parse_qs, urlparse
+import webbrowser
+
+VAULT_ROOT = None  # main()実行時にセットされる
+
+
+class Handler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        parsed = urlparse(self.path)
+        try:
+            if parsed.path == "/":
+                self._serve_file(WEB_DIR / "index.html", "text/html")
+            elif parsed.path == "/obsidian.html":
+                self._serve_file(WEB_DIR / "obsidian.html", "text/html")
+            elif parsed.path == "/api/obsidian/facets":
+                notes = scan_vault(VAULT_ROOT)
+                facets = build_facets(notes)
+                facets["vault_name"] = VAULT_ROOT.name
+                self._serve_json(facets)
+            elif parsed.path == "/api/obsidian/notes":
+                qs = {k: v[0] for k, v in parse_qs(parsed.query).items()}
+                notes = scan_vault(VAULT_ROOT)
+                self._serve_json(filter_notes(notes, qs))
+            else:
+                self.send_error(404)
+        except Exception as exc:  # noqa: BLE001 - Vaultスキャン失敗を500で返すため意図的に広く捕捉
+            self._serve_json({"error": str(exc)}, status=500)
+
+    def _serve_file(self, path: Path, content_type: str):
+        if not path.is_file():
+            self.send_error(404)
+            return
+        data = path.read_bytes()
+        self.send_response(200)
+        self.send_header("Content-Type", f"{content_type}; charset=utf-8")
+        self.send_header("Content-Length", str(len(data)))
+        self.end_headers()
+        self.wfile.write(data)
+
+    def _serve_json(self, obj, status: int = 200):
+        data = json.dumps(obj, ensure_ascii=False).encode("utf-8")
+        self.send_response(status)
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Content-Length", str(len(data)))
+        self.end_headers()
+        self.wfile.write(data)
+
+    def log_message(self, format, *args):  # noqa: A002 - BaseHTTPRequestHandlerのシグネチャに合わせる
+        pass  # 標準出力へのアクセスログは出さない（個人ローカルツールのため）
+
+
+def main():
+    global VAULT_ROOT
+    VAULT_ROOT = get_vault_path()
+    server = ThreadingHTTPServer(("localhost", PORT), Handler)
+    print(f"Serving on http://localhost:{PORT} (vault: {VAULT_ROOT})")
+    webbrowser.open(f"http://localhost:{PORT}")
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        server.shutdown()
+
+
 if __name__ == "__main__":
-    vault_root = get_vault_path()
-    notes = scan_vault(vault_root)
-    print(json.dumps(build_facets(notes), ensure_ascii=False, indent=2))
-    print(f"{len(notes)} 件のノートをスキャンしました")
+    main()

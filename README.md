@@ -64,10 +64,12 @@ launchctl load ~/Library/LaunchAgents/com.tomo.ig-daily-fetch.plist
 │   └── daily_log.csv     # 毎朝の自動実行で1行ずつ追記される時系列ログ
 ├── reports/
 │   └── report_*.md       # analyze.pyが生成する日付付きレポート
-└── logs/
-    ├── daily_fetch.log       # daily_fetch.sh実行時の標準出力
-    ├── launchd.out.log       # launchdからの標準出力
-    └── launchd.err.log       # launchdからの標準エラー
+├── logs/
+│   ├── daily_fetch.log       # daily_fetch.sh実行時の標準出力
+│   ├── launchd.out.log       # launchdからの標準出力
+│   └── launchd.err.log       # launchdからの標準エラー
+└── web/
+    └── server.py          # ローカルダッシュボード用HTTPサーバ(Obsidian Properties検索など)。 /api/obsidian/* を提供
 ```
 
 ## セットアップ済みの内容
